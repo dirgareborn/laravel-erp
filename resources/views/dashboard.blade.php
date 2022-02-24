@@ -15,7 +15,7 @@
                     <span class="info-box-icon bg-info elevation-1"><i class="fas fa-money-bill-alt"></i></span>
                     <div class="info-box-content">
                     <span class="info-box-text">{{ __('adminlte::adminlte.total_income') }}</span>
-                    <span class="info-box-number">2,000</span>
+                    <span class="info-box-number">@currency($sale)</span>
                     </div>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                     <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-shopping-cart"></i></span>
                     <div class="info-box-content">
                     <span class="info-box-text">{{ __('adminlte::adminlte.total_expense') }}</span>
-                    <span class="info-box-number">2,000</span>
+                    <span class="info-box-number">@currency($expences)</span>
                     </div>
                     </div>
                 </div>
@@ -33,10 +33,73 @@
                     <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
                     <div class="info-box-content">
                     <span class="info-box-text">{{ __('adminlte::adminlte.total_profit') }}</span>
-                    <span class="info-box-number">2,000</span>
+                    <span class="info-box-number">@currency($profit)</span>
                     </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-12 col-md-12">
+            <div class="row">
+                <div class="card">
+                    <table id="table1" class="table border cell-border" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">No</th>
+                                <th rowspan="2">Date</th>
+                                <th colspan="2">Income</th>
+                                <th colspan="2">Expences</th>
+                                <th rowspan="2">Saldo</th>
+                            </tr>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Vendor</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($datatable as $key => $d)
+                            <tr>
+
+                                        <td> {{ $key+1 }}</td>
+                                        <td> {{ format_date($d['date']) }}</td>
+                                        <td>
+                                            @if($d['sort'] == 'sale')
+                                                {{ $d->customer->name }}
+                                            @else - @endif
+                                        </td>
+                                        <td>
+                                            @if($d['sort'] == 'sale')
+                                                @currency($d->total)
+                                            @else - @endif
+                                        </td>
+                                        <td>
+                                            @if($d['sort'] == 'purchase')
+                                                {{ $d->vendor->name }}
+                                            @else - @endif
+                                        </td>
+                                        <td>
+                                            @if($d['sort'] == 'purchase')
+                                                @currency($d->total)
+                                            @else - @endif
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                            @empty
+                            @endforelse
+                        </tbody>
+                        <tfoot>
+                            <th></th>
+                            <th></th>
+                            <th>Total</th>
+                            <th></th>
+                            <th>Total</th>
+                            <th></th>
+                            <th></th>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
             </div>
             <div class="card">
                 <div class="card-body">
@@ -78,19 +141,61 @@
             </div>
         </div>
     </div>
+    @section('plugins.Datatables', true)
+@section('plugins.DatatablesPlugin', true)
     @stop
     @push('js')
         @section('plugins.Chartjs', true)
     <script>
-    $(function(){'use strict'
-    var ticksStyle={fontColor:'#495057',fontStyle:'bold'}
-    var mode='index'
-    var intersect=true
-    var $salesChart=$('#sales-chart')
-    var salesChart=new Chart($salesChart,{type:'bar',data:{labels:['JUN','JUL','AUG','SEP','OCT','NOV','DEC'],datasets:[{backgroundColor:'#007bff',borderColor:'#007bff',data:[1000,2000,3000,2500,2700,2500,3000]},{backgroundColor:'#ced4da',borderColor:'#ced4da',data:[700,1700,2700,2000,1800,1500,2000]}]},options:{maintainAspectRatio:false,tooltips:{mode:mode,intersect:intersect},hover:{mode:mode,intersect:intersect},legend:{display:false},scales:{yAxes:[{gridLines:{display:true,lineWidth:'4px',color:'rgba(0, 0, 0, .2)',zeroLineColor:'transparent'},ticks:$.extend({beginAtZero:true,callback:function(value){if(value>=1000){value/=1000
-    value+='k'}
-    return '$'+value}},ticksStyle)}],xAxes:[{display:true,gridLines:{display:false},ticks:ticksStyle}]}}})
-    var $visitorsChart=$('#visitors-chart')
-    var visitorsChart=new Chart($visitorsChart,{data:{labels:['18th','20th','22nd','24th','26th','28th','30th'],datasets:[{type:'line',data:[100,120,170,167,180,177,160],backgroundColor:'transparent',borderColor:'#007bff',pointBorderColor:'#007bff',pointBackgroundColor:'#007bff',fill:false},{type:'line',data:[60,80,70,67,80,77,100],backgroundColor:'tansparent',borderColor:'#ced4da',pointBorderColor:'#ced4da',pointBackgroundColor:'#ced4da',fill:false}]},options:{maintainAspectRatio:false,tooltips:{mode:mode,intersect:intersect},hover:{mode:mode,intersect:intersect},legend:{display:false},scales:{yAxes:[{gridLines:{display:true,lineWidth:'4px',color:'rgba(0, 0, 0, .2)',zeroLineColor:'transparent'},ticks:$.extend({beginAtZero:true,suggestedMax:200},ticksStyle)}],xAxes:[{display:true,gridLines:{display:false},ticks:ticksStyle}]}}})})
+        $(function () {
+            var month = JSON.parse($month); 
+            var data = JSON.parse($sales_per_month_data);
+
+            var ctx = document.getElementById('sales-chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: month,
+                    datasets: [{
+                        label: 'Sales',
+                        data: data,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                    },
+                    {
+                        label: 'Expenses',
+                        data: [0, 20, 10, 30, 15, 40, 20, 60, 60],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                    },
+                    {
+                        label: 'Profit',
+                        data: [0, 30, 15, 40, 20, 50, 25, 70, 40],
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 5
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: false,
+                    }
+                }
+            });
+        });
+
     </script>
     @endpush

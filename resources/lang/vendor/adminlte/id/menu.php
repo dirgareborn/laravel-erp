@@ -22,7 +22,7 @@ return [
     'purchases'                     => 'Pembelian',
     'purchases_list'                => 'Daftar Pembelian',
     'new_purchases'                 => 'Input Pembelian Baru',
-    'banking'                       => 'Rekening Bank',
+    'banking'                       => 'Perbankan',
     'new_transfer'                  => 'Input Transfer Baru',
     'transfers_list'                => 'Daftar Transfer',
     'expenses'                      => 'Pengeluaran',

@@ -20,11 +20,12 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
-Route::get('/dashboard', function() {
-    return view('dashboard');
-})->name('dashboard')->middleware('auth');
+
 Route::view('/admin/change-password', 'change-password')->name('change-password');
 Route::post('/change-password',  [App\Http\Controllers\ChangePasswordController::class, '__invoke'])->name('submit_change_pw');
-Route::prefix('admin')->group(function () {
-    Route::resource('product', 'ProductController');
-});
+Route::resource('item', 'ItemController');
+Route::resource('customer', 'CustomerController');
+Route::resource('invoice', 'InvoiceController');
+Route::get('getItem', 'InvoiceController@getItem')->name('getItem');
+Route::get('revenue', 'InvoiceController@revenue');
+Route::resource('bill', 'PurchaseController');
