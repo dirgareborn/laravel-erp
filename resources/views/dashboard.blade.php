@@ -83,7 +83,9 @@
                                                 @currency($d->total)
                                             @else - @endif
                                         </td>
-                                        <td></td>
+                                        <td>
+                                            
+                                        </td>
                                     </tr>
                             @empty
                             @endforelse
@@ -112,7 +114,7 @@
                     <div class="card-body">
                     <div class="d-flex">
                     <p class="d-flex flex-column">
-                    <span class="text-bold text-lg">$18,230.00</span>
+                    <span class="text-bold text-lg">@currency($sale)</span>
                     <span>Sales Over Time</span>
                     </p>
                     <p class="ml-auto d-flex flex-column text-right">
@@ -148,50 +150,20 @@
         @section('plugins.Chartjs', true)
     <script>
         $(function () {
-            var month = JSON.parse($month); 
-            var data = JSON.parse($sales_per_month_data);
-
-            var ctx = document.getElementById('sales-chart').getContext('2d');
+            var ctx = document.getElementById("sales-chart");
+            var labels = JSON.parse('{!! json_encode($sales_per_month_data) !!}');
+            var datasets = JSON.parse('{!! json_encode($sales_per_month_data) !!}');
             var myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: month,
-                    datasets: [{
-                        label: 'Sales',
-                        data: data,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 2,
-                        fill: true,
-                    },
-                    {
-                        label: 'Expenses',
-                        data: [0, 20, 10, 30, 15, 40, 20, 60, 60],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 2,
-                        fill: true,
-                    },
-                    {
-                        label: 'Profit',
-                        data: [0, 30, 15, 40, 20, 50, 25, 70, 40],
-                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
-                        borderWidth: 2,
-                        fill: true,
-                    }]
+                    labels: labels.labels,
+                    datasets: datasets.datasets
                 },
                 options: {
                     scales: {
                         yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                stepSize: 5
-                            }
+                            stacked: true
                         }]
-                    },
-                    legend: {
-                        display: false,
                     }
                 }
             });
